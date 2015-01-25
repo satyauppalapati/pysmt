@@ -18,6 +18,7 @@
 from pysmt.decorators import deprecated
 from pysmt.shortcuts import get_type
 from pysmt.typing import BOOL
+from pysmt.exceptions import InvalidModelError
 
 class Solver(object):
     """ Represents a generic SMT Solver. """
@@ -261,6 +262,15 @@ class Model(object):
             v = self.get_py_value(f)
             res[f] = v
         return res
+
+    def validate_model(self, formula):
+        """Verify that model is a model for formula.
+
+        Raise a InvalidModel Exception if the model is not valid.
+        """
+        if not self.get_py_value(formula):
+            raise InvalidModelError
+        return
 
     def __getitem__(self, idx):
         return self.get_value(idx)

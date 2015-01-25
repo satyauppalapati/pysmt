@@ -53,3 +53,7 @@ class SolverRedefinitionError(Exception):
     """Exception representing errors caused by multiple defintion of solvers
        having the same name."""
     pass
+
+class InvalidModelError(Exception):
+    """The candidate model is not a valid model for a formula."""
+    pass

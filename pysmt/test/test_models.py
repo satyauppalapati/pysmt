@@ -19,6 +19,7 @@ from pysmt.shortcuts import Solver, Symbol, And, Real, GT, LT, Implies, FALSE
 from pysmt.shortcuts import get_env
 from pysmt.typing import BOOL, REAL
 from pysmt.test import TestCase, skipIfNoSolverAvailable
+from pysmt.test.examples import get_example_formulae
 
 class TestModels(TestCase):
 
@@ -51,6 +52,18 @@ class TestModels(TestCase):
             s.solve()
             model = s.get_model()
             self.assertTrue(model.get_py_value(varA))
+
+    @skipIfNoSolverAvailable
+    def test_validate_model(self):
+        for example in get_example_formulae():
+            if not example.is_sat:
+                continue
+            if not example.logic.quantifier_free:
+                continue
+            with Solver(logic=example.logic) as s:
+                self.assertTrue(s.is_sat(example.expr))
+                model = s.get_model()
+                self.assertIsNone(model.validate_model(example.expr))
 
 
 if __name__ == '__main__':

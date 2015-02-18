@@ -16,7 +16,7 @@
 #   limitations under the License.
 #
 from pysmt.solvers.solver import Model
-from pysmt.shortcuts import get_env, Real, Bool, Int
+import pysmt.shortcuts
 from pysmt.typing import REAL, BOOL, INT
 
 class EagerModel(Model):
@@ -30,7 +30,7 @@ class EagerModel(Model):
 
     def __init__(self, assignment, environment=None):
         if environment is None:
-            environment = get_env()
+            environment = pysmt.shortcuts.get_env()
         Model.__init__(self, environment)
         self.environment = environment
         self.assignment = assignment
@@ -50,11 +50,11 @@ class EagerModel(Model):
                 raise TypeError("Was expecting a symbol but got %s" %s)
 
             if s.is_symbol(BOOL):
-                value = Bool(False)
+                value = pysmt.shortcuts.Bool(False)
             elif s.is_symbol(REAL):
-                value = Real(0)
+                value = pysmt.shortcuts.Real(0)
             elif s.is_symbol(INT):
-                value = Int(0)
+                value = pysmt.shortcuts.Int(0)
             else:
                 raise TypeError("Unhandled type for %s: %s" %
                                 (s, s.symbol_type()))

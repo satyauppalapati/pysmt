@@ -16,7 +16,7 @@
 #   limitations under the License.
 #
 from pysmt.decorators import deprecated
-from pysmt.shortcuts import get_type
+import pysmt.shortcuts
 from pysmt.typing import BOOL
 
 class Solver(object):
@@ -204,7 +204,7 @@ class Solver(object):
 
         Raises TypeError.
         """
-        t = get_type(formula)
+        t = pysmt.shortcuts.get_type(formula)
         if t != BOOL:
             raise TypeError("Argument must be boolean.")
 

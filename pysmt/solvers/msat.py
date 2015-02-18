@@ -29,7 +29,7 @@ from pysmt.walkers import DagWalker
 from pysmt.exceptions import SolverReturnedUnknownResultError
 from pysmt.exceptions import InternalSolverError
 from pysmt.decorators import clear_pending_pop
-from pysmt.environment import TypeUnsafeEnvironment
+import pysmt.environment
 from pysmt.utils.generic_number import GenericNumber, disambiguate
 
 
@@ -224,7 +224,7 @@ class MSatConverter(DagWalker):
 
 
     def back(self, expr):
-        tu_env = TypeUnsafeEnvironment()
+        tu_env = pysmt.environment.TypeUnsafeEnvironment()
         tu_res = self._walk_back(expr, tu_env.formula_manager)
         tu_f = disambiguate(tu_env, tu_res, create_toreal_on_demand=True)
         return self.env.formula_manager.normalize(tu_f)
@@ -394,7 +394,12 @@ class MSatConverter(DagWalker):
 
     def walk_lt(self, formula, args):
         assert len(args) == 2
+        print "--->", mathsat.msat_term_repr(args[0])
+        print "--->", mathsat.msat_term_repr(args[1])
+
         leq = mathsat.msat_make_leq(self.msat_env, args[1], args[0])
+        if mathsat.MSAT_ERROR_TERM(leq):
+            raise TypeError()
         return mathsat.msat_make_not(self.msat_env, leq)
 
     def walk_ite(self, formula, args):
@@ -442,8 +447,9 @@ class MSatConverter(DagWalker):
         raise NotImplementedError
 
     def walk_plus(self, formula, args):
-        res = mathsat.msat_make_number(self.msat_env, "0")
-        for a in args:
+        res = args[0]
+        for a in args[1:]:
+            print a
             res = mathsat.msat_make_plus(self.msat_env, res, a)
         return res
 
@@ -487,7 +493,7 @@ class MSatConverter(DagWalker):
         # In mathsat toreal is implicit
         return args[0]
 
-    def _type_to_msat(self, tp):
+    def type_to_msat(self, tp):
         if tp.is_bool_type():
             return self.boolType
         elif tp.is_real_type():
@@ -495,8 +501,8 @@ class MSatConverter(DagWalker):
         elif tp.is_int_type():
             return self.intType
         elif tp.is_function_type():
-            stps = [self._type_to_msat(x) for x in tp.param_types]
-            rtp = self._type_to_msat(tp.return_type)
+            stps = [self.type_to_msat(x) for x in tp.param_types]
+            rtp = self.type_to_msat(tp.return_type)
             return mathsat.msat_get_function_type(self.msat_env,
                                                 stps,
                                                 rtp)
@@ -506,7 +512,7 @@ class MSatConverter(DagWalker):
     def declare_variable(self, var):
         if not var.is_symbol(): raise TypeError
         if var.symbol_name() not in self.symbol_to_decl:
-            tp = self._type_to_msat(var.symbol_type())
+            tp = self.type_to_msat(var.symbol_type())
             decl = mathsat.msat_declare_function(self.msat_env,
                                                  var.symbol_name(),
                                                  tp)

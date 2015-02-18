@@ -31,9 +31,12 @@ import pysmt.formula
 import pysmt.factory
 import pysmt.shortcuts
 import pysmt.decorators
+import pysmt.native_nodes.msat
+
 
 class Environment(object):
-    FormulaManagerClass = pysmt.formula.FormulaManager
+    #FormulaManagerClass = pysmt.formula.FormulaManager
+    FormulaManagerClass = pysmt.native_nodes.msat.MsatFormulaManager
 
     def __init__(self):
         self._stc = pysmt.type_checker.SimpleTypeChecker(self)
@@ -117,5 +120,9 @@ class Environment(object):
 
 class TypeUnsafeEnvironment(Environment):
     FormulaManagerClass = pysmt.formula.TypeUnsafeFormulaManager
+
+class MsatNativeEnvironment(Environment):
+    FormulaManagerClass = pysmt.native_nodes.msat.MsatFormulaManager
+
 
 #EOC TypeUnsafeFormulaManager

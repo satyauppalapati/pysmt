@@ -264,6 +264,7 @@ class TestFormulaManager(TestCase):
         self.assertIsNotNone(n)
 
         inv = self.mgr.Real((1, self.rconst.constant_value()))
+        print n
         self.assertEqual(n, self.mgr.Times(self.s, inv))
 
     def test_equals(self):

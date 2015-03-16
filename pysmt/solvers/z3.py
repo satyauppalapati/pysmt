@@ -34,6 +34,7 @@ import pysmt.logics
 
 # patch z3api
 z3.is_ite = lambda x: z3.is_app_of(x, z3.Z3_OP_ITE)
+z3.is_iff = lambda x: z3.is_app_of(x, z3.Z3_OP_IFF)
 
 class AstRefKey:
     def __init__(self, n):
@@ -206,6 +207,9 @@ class Z3Converter(Converter, DagWalker):
                 res = self.mgr.Iff(args[0], args[1])
             else:
                 res = self.mgr.Equals(args[0], args[1])
+
+        elif z3.is_iff(expr):
+            res = self.mgr.Iff(args[0], args[1])
 
         elif z3.is_false(expr):
             res = self.mgr.FALSE()

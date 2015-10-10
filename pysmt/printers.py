@@ -150,6 +150,9 @@ class HRPrinter(TreeWalker):
         self.write("%d_%d" % (formula.constant_value(),
                               formula.bv_width()))
 
+    def walk_enum_constant(self, formula):
+        self.write("`%s`" % formula.constant_value())
+
     def walk_bv_xor(self, formula):
         self.walk_binary(" xor ", formula)
 

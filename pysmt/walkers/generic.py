@@ -79,6 +79,8 @@ class Walker(object):
         self.functions[op.BV_SREM] = self.walk_bv_srem
         self.functions[op.BV_ASHR] = self.walk_bv_ashr
 
+        self.functions[op.ENUM_CONSTANT] = self.walk_enum_constant
+
         undefined_types = set(op.ALL_TYPES) - set(self.functions.keys())
         assert len(undefined_types) == 0, \
             "The following types are not defined in the generic walker: {%s}" % \
@@ -253,3 +255,6 @@ class Walker(object):
 
     def walk_bv_ashr(self, formula, **kwargs):
         return self.walk_error(formula, **kwargs)
+
+    def walk_enum_constant(self, formula,  **kwargs):
+        return self.walk_error(formula,  **kwargs)

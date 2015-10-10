@@ -24,7 +24,7 @@ these operators.
 from six.moves import xrange
 
 
-ALL_TYPES = list(xrange(0,47))
+ALL_TYPES = list(xrange(0,48))
 
 (
 FORALL, EXISTS, AND, OR, NOT, IMPLIES, IFF, # Boolean Logic (0-6)
@@ -53,6 +53,8 @@ BV_COMP,                                    # Returns 1_1 if the arguments are
                                             # equal otherwise it returns 0_1 (44)
 BV_SDIV, BV_SREM,                           # Signed Division and Reminder(45-46)
 BV_ASHR,                                    # Arithmetic shift right (47)
+
+ENUM_CONSTANT
 ) = ALL_TYPES
 
 QUANTIFIERS = frozenset([FORALL, EXISTS])
@@ -63,7 +65,8 @@ BOOL_OPERATORS = frozenset(QUANTIFIERS | BOOL_CONNECTIVES)
 
 RELATIONS = frozenset([LE, LT, EQUALS, BV_ULE, BV_ULT, BV_SLT, BV_SLE])
 
-CONSTANTS = frozenset([REAL_CONSTANT, BOOL_CONSTANT, INT_CONSTANT, BV_CONSTANT])
+CONSTANTS = frozenset([REAL_CONSTANT, BOOL_CONSTANT, INT_CONSTANT,
+                       BV_CONSTANT, ENUM_CONSTANT])
 
 BV_OPERATORS = frozenset([BV_CONSTANT, BV_NOT, BV_AND, BV_OR, BV_XOR,
                           BV_CONCAT, BV_EXTRACT, BV_ULT, BV_ULE, BV_NEG, BV_ADD,
@@ -149,4 +152,5 @@ __OP_STR__ = {
     BV_SDIV : "BV_SDIV",
     BV_SREM : "BV_SREM",
     BV_ASHR : "BV_ASHR",
+    ENUM_CONSTANT: "ENUM_CONSTANT",
 }

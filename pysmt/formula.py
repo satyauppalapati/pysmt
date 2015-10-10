@@ -307,6 +307,19 @@ class FormulaManager(object):
         return n
 
 
+    def Const(self, value, type_):
+        """Creates a constant for the given type"""
+        if type_.is_bool_type():
+            return self.Bool(value)
+        if type_.is_real_type():
+            return self.Real(value)
+        if type_.is_int_type():
+            return self.Int(value)
+        if type_.is_bv_type():
+            return self.BV(value, type_.width)
+        if type_.is_enum_type():
+            return self.Enum(value, type_)
+
     def Real(self, value):
         """ Returns a Real-type constant of the given value.
 
@@ -368,6 +381,12 @@ class FormulaManager(object):
             return self.true_formula
         else:
             return self.false_formula
+
+    def Enum(self, value, type_):
+        n = self.create_node(node_type=op.ENUM_CONSTANT,
+                             args=tuple(),
+                             payload=(value, type_))
+        return n
 
 
     def And(self, *args):

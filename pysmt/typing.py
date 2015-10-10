@@ -23,17 +23,19 @@ In the current version these are:
  * Real
  * BVType
  * FunctionType
+ * EnumType
 
 Types are represented by singletons. Basic types (Bool, Int and Real)
-are constructed here by default, while BVType and FunctionType relies
-on a factory service. Each BitVector width is represented by a
-different instance of BVType.
+are constructed here by default, while BVType, FunctionType, EnumType
+rely on a factory service, e.g., each BitVector width is represented
+by a different instance of BVType.
 
 """
 
 # Global dictionary of types, used to store the singletons
 __CUSTOM_TYPES__ = {}
 __BV_TYPES__ = {}
+__ENUM_TYPES__ = {}
 
 class PySMTType(object):
     """Abstract class for representing a type within pySMT."""
@@ -51,6 +53,9 @@ class PySMTType(object):
         return False
 
     def is_bv_type(self):
+        return False
+
+    def is_enum_type(self):
         return False
 
     def is_function_type(self):
@@ -179,7 +184,6 @@ class _BVType(PySMTType):
             return True
         return False
 
-        return True
     def __hash__(self):
         return hash(self.type_id + self.width)
 
@@ -250,6 +254,62 @@ class _FunctionType(PySMTType):
                            [str(self.return_type)])
 
     def is_function_type(self):
+        return True
+
+    def __eq__(self, other):
+        if other is None:
+            return False
+        if self.type_id != other.type_id:
+            return False
+        if id(self) == id(other):
+            return True
+        return str(self) == str(other)
+
+    def __ne__(self, other):
+        if other is None:
+            return True
+        if self.type_id != other.type_id:
+            return True
+        if id(self) == id(other):
+            return False
+        return str(self) != str(other)
+
+    def __hash__(self):
+        return self._hash
+
+
+def EnumType(*domain_values):
+    """Returns the singleton of the Enum type with the given domain
+
+    This function takes care of building and registering the type
+    whenever needed. To see the functions provided by the type look at
+    _EnumType
+    """
+    key = tuple(domain_values)
+    if key not in __ENUM_TYPES__:
+        res = _EnumType(domain=key)
+        __ENUM_TYPES__[key] = res
+    return  __ENUM_TYPES__[key]
+
+
+class _EnumType(PySMTType):
+    """Internal class used to represent an Enum type.
+
+    This class should not be instantiated directly, but the factory
+    method EnumType should be used instead.
+    """
+    def __init__(self, domain):
+        PySMTType.__init__(self, type_id = 5)
+        self.domain = domain
+        self._hash = hash(str(self))
+        return
+
+    def as_smtlib(self, funstyle=True):
+        raise NotImplementedError
+    def __str__(self):
+        return "{%s}" % ",".join([str(d) for d in self.domain])
+
+    def is_enum_type(self):
         return True
 
     def __eq__(self, other):

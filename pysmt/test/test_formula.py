@@ -20,7 +20,7 @@ from fractions import Fraction
 from six.moves import xrange
 
 import pysmt
-from pysmt.typing import BOOL, REAL, INT, FunctionType
+from pysmt.typing import BOOL, REAL, INT, FunctionType, EnumType
 from pysmt.shortcuts import Symbol, is_sat, Not, Implies, GT, Plus, Int, Real
 from pysmt.shortcuts import Minus, Times, Xor, And, Or, TRUE
 from pysmt.shortcuts import get_env
@@ -732,6 +732,13 @@ class TestFormulaManager(TestCase):
 
         self.assertTrue(self.ftype.is_function_type())
         self.assertFalse(self.ftype.is_int_type())
+
+    def test_enum(self):
+        colors_enum = EnumType("red", "green", "yellow")
+        x = self.mgr.Symbol("lucky-color", colors_enum)
+        red = self.mgr.Const("red", colors_enum)
+        f = self.mgr.Equals(x, red)
+
 
 class TestShortcuts(TestCase):
 

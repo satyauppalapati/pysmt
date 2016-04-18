@@ -1,126 +1,29 @@
-language: python
-
-sudo: false
-
-cache:
-  apt: true
-  directories:
-  - ${HOME}/.smt_solvers/btor
-  - ${HOME}/.cache/pip
-  - ${HOME}/python_bindings/all
-  - ${HOME}/python_bindings/msat
-  - ${HOME}/python_bindings/z3
-  - ${HOME}/python_bindings/cvc4
-  - ${HOME}/python_bindings/yices
-  - ${HOME}/python_bindings/bdd
-  - ${HOME}/python_bindings/picosat
-  - ${HOME}/python_bindings/btor
-
-addons:
-  apt:
-    packages:
-    - python-setuptools
-    - python-nose
-    - python-pip
-    - python-dev
-    - make
-    - build-essential
-    - swig
-    - libgmp-dev
-    - autoconf
-    - libtool
-    - wget
-    - curl
-    - libboost-dev
-    - python3-dev
-
-python:
-  - 2.7
-  - 3.4
-  - pypy
-  - pypy3
-
-
-# Multiple envs will cause multiple build across multiple python versions.
-# We test the following:
-# 1. PySMT w/o solvers
-# 2. PySMT with one solver at the time
-#
+os: osx
+language: objective-c
 env:
   matrix:
-    - PYSMT_SOLVER="all"
-    - PYSMT_SOLVER="None"
-    - PYSMT_SOLVER="msat"
-    - PYSMT_SOLVER="z3"
-    - PYSMT_SOLVER="cvc4"
-    - PYSMT_SOLVER="yices"
-    - PYSMT_SOLVER="bdd"
-    - PYSMT_SOLVER="picosat"
-    - PYSMT_SOLVER="btor"
-    - PYSMT_SOLVER="msat_wrap"
-
-matrix:
-  fast_finish: true
-  include:
-    - python: 2.7
-      env: PYSMT_SOLVER="z3_wrap"
-
-  exclude:
-    - python: 3.4
-      env: PYSMT_SOLVER="cvc4"
-    - python: 3.4
-      env: PYSMT_SOLVER="yices"
-    - python: 3.4
-      env: PYSMT_SOLVER="bdd"
-    - python: 3.4
-      env: PYSMT_SOLVER="all"
-
-    - python: pypy
-      env: PYSMT_SOLVER="msat"
-    - python: pypy
-      env: PYSMT_SOLVER="z3"
-    - python: pypy
-      env: PYSMT_SOLVER="cvc4"
-    - python: pypy
-      env: PYSMT_SOLVER="yices"
-    - python: pypy
-      env: PYSMT_SOLVER="bdd"
-    - python: pypy
-      env: PYSMT_SOLVER="picosat"
-    - python: pypy
-      env: PYSMT_SOLVER="btor"
-    - python: pypy
-      env: PYSMT_SOLVER="all"
-
-    - python: pypy3
-      env: PYSMT_SOLVER="msat"
-    - python: pypy3
-      env: PYSMT_SOLVER="z3"
-    - python: pypy3
-      env: PYSMT_SOLVER="cvc4"
-    - python: pypy3
-      env: PYSMT_SOLVER="yices"
-    - python: pypy3
-      env: PYSMT_SOLVER="bdd"
-    - python: pypy3
-      env: PYSMT_SOLVER="picosat"
-    - python: pypy3
-      env: PYSMT_SOLVER="btor"
-    - python: pypy3
-      env: PYSMT_SOLVER="all"
+    - PYVERSION=python  PIP_CMD=pip  PYSMT_SOLVER="None"
+    - PYVERSION=python  PIP_CMD=pip  PYSMT_SOLVER="msat"
+    - PYVERSION=python  PIP_CMD=pip  PYSMT_SOLVER="z3"
+#    - PYVERSION=python3 PIP_CMD=pip3 PYSMT_SOLVER="z3"
 
 install:
-  # This is for btor that fails to find the python 3 library to link
-  - "export LIBRARY_PATH=${LIBRARY_PATH}:/opt/python/3.4.2/lib"
-
-  - "pip install six"
-  - if [ "${PYSMT_SOLVER}" == "all" ] || [ "${PYSMT_SOLVER}" == "btor" ]; then pip install cython; fi
+  - "brew update"
+  - "brew install swig"
+  - "brew install ${PYVERSION}"
+  - hash -r ${PYVERSION}
+  - "${PIP_CMD} install six"
+  - "${PIP_CMD} install nose"
+  - "${PIP_CMD} install urllib3"
   - "export BINDINGS_FOLDER=${HOME}/python_bindings/${PYSMT_SOLVER}"
   - "mkdir -p ${BINDINGS_FOLDER}"
-  - "python install.py --confirm-agreement --bindings-path ${BINDINGS_FOLDER}"
-  - "eval `python install.py --env --bindings-path ${BINDINGS_FOLDER}`"
+  - "export PYTHON_EXE=`which ${PYVERSION}`"
+  - "${PYTHON_EXE} install.py --confirm-agreement --bindings-path ${BINDINGS_FOLDER}"
+  - "eval `${PYTHON_EXE} install.py --env --bindings-path ${BINDINGS_FOLDER}`"
 
 script:
+  - echo ${PYTHON_EXE}
+  - "${PYTHON_EXE} --version"
   - "echo ${PYTHONPATH}"
   - "python install.py --check"
   - "nosetests pysmt -v"

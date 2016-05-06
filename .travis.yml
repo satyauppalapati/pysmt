@@ -4,12 +4,14 @@ env:
   matrix:
     - PYVERSION=python  PIP_CMD=pip  PYSMT_SOLVER="None"
     - PYVERSION=python  PIP_CMD=pip  PYSMT_SOLVER="msat"
+    - PYVERSION=python3  PIP_CMD=pip  PYSMT_SOLVER="msat"
     - PYVERSION=python  PIP_CMD=pip  PYSMT_SOLVER="z3"
-#    - PYVERSION=python3 PIP_CMD=pip3 PYSMT_SOLVER="z3"
+    - PYVERSION=python3 PIP_CMD=pip3 PYSMT_SOLVER="z3"
 
-allow_failures:
-  matrix:
-      - PYVERSION=python  PIP_CMD=pip  PYSMT_SOLVER="msat"
+matrix:
+  allow_failures:
+    - env: PYVERSION=python  PIP_CMD=pip  PYSMT_SOLVER="msat"
+    - env: PYVERSION=python3  PIP_CMD=pip  PYSMT_SOLVER="msat"
 
 install:
   - "brew update"
@@ -29,5 +31,5 @@ script:
   - echo ${PYTHON_EXE}
   - "${PYTHON_EXE} --version"
   - "echo ${PYTHONPATH}"
-  - "python install.py --check"
+  - "${PYTHON_EXE} install.py --check"
   - "nosetests pysmt -v"
